@@ -1,19 +1,24 @@
 async function getWeather() {
-  const state = document.getElementById("state").value;
-  const district = document.getElementById("district").value;
+  const state = document.getElementById("state").value.trim();
+  const district = document.getElementById("district").value.trim();
 
-  const location = district + "," + state;
+  if (!state || !district) {
+    alert("Please enter state and city");
+    return;
+  }
 
-  const apiKey = "YOUR_API_KEY"; // replace this
+  const apiKey = "577457b685ad2bf6bc5af4cf5ebbfb4f";
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${district},IN&appid=${apiKey}&units=metric;`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${district},${state},IN&appid=${apiKey}&units=metric`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (data.cod === "404") {
-      alert("Location not found");
+    console.log(data);
+
+    if (data.cod != 200) {
+      alert(data.message);
       return;
     }
 
