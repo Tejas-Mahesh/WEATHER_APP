@@ -1,36 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Karnataka Weather App</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-  <h1>🌦️ Karnataka Weather</h1>
+    <div class="card">
+        <h1>🌤 Weather App</h1>
 
-  <div class="input-box">
-    <input type="text" value="Karnataka" disabled>
+        <div class="weather-box">
+            <h2 id="city">Loading...</h2>
+            <h1 id="temp">--°C</h1>
+            <p id="desc">--</p>
+            <img id="icon" src="" alt="">
+        </div>
 
-    <select id="district" onchange="updateTaluks()">
-      <option value="">Select District</option>
-    </select>
-
-    <select id="taluk">
-      <option value="">Select Taluk</option>
-    </select>
-
-    <button onclick="getWeather()">Check Weather</button>
-  </div>
-
-  <div class="weather-box" id="weatherBox">
-    <h2 id="location"></h2>
-    <p id="temp"></p>
-    <p id="condition"></p>
-    <p id="humidity"></p>
-    <p id="wind"></p>
-  </div>
+        <button id="refresh">📍 Get Current Location</button>
+    </div>
 </div>
 
 <script src="script.js"></script>
