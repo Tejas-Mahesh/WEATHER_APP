@@ -14,39 +14,41 @@ body {
 }
 
 .container {
-    animation: fadeIn 1.5s ease-in-out;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .card {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
-    padding: 30px;
+    padding: 25px;
     border-radius: 20px;
     text-align: center;
-    width: 300px;
+    width: 320px;
     color: white;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .weather-box img {
-    width: 80px;
+    width: 90px;
+    margin: 10px 0;
     animation: float 2s infinite ease-in-out;
 }
 
+.info {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
 button {
-    margin-top: 20px;
+    margin-top: 15px;
     padding: 10px 20px;
+    border-radius: 25px;
     border: none;
-    border-radius: 30px;
+    cursor: pointer;
     background: white;
     color: #333;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
@@ -55,13 +57,9 @@ button:hover {
 }
 
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 
