@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div class="container">
     <div class="card">
-        <h1>🌤 Weather App</h1>
+
+        <h2 id="city">Loading...</h2>
+        <p id="date"></p>
 
         <div class="weather-box">
-            <h2 id="city">Loading...</h2>
+            <img id="weatherImg" src="" alt="">
             <h1 id="temp">--°C</h1>
             <p id="desc">--</p>
-            <img id="icon" src="" alt="">
         </div>
 
-        <button id="refresh">📍 Get Current Location</button>
+        <div class="info">
+            🌬 Wind: <span id="wind">--</span><br>
+            💧 Humidity: <span id="humidity">--</span><br>
+            ☔ Rain: <span id="rain">--</span>
+        </div>
+
+        <button id="refresh">📍 Refresh Location</button>
+
     </div>
 </div>
+
 
 <script src="script.js"></script>
 </body>
 </html>
+
