@@ -40,6 +40,20 @@ body {
     margin-top: 10px;
     font-size: 14px;
 }
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    color: #333;
+}
+
+button:hover {
+    background: #333;
+    color: white;
+}
 
 
 
