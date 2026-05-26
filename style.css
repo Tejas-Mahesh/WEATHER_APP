@@ -42,7 +42,13 @@ body {
     font-size: 14px;
 }
 button {
-    
+    margin-top: 15px;
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    color: #333;  
 }
 
 button:hover {
