@@ -1,39 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weather App</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+<body class="weather-default">
 
-<body>
+  <!-- Dynamic ambient canvas for particles (rain/snow/mist) -->
+  <canvas id="weather-canvas"></canvas>
 
-<div class="container">
-    <div class="card">
+  <main class="app-wrapper">
+    <div class="weather-card">
+      
+      <!-- Header -->
+      <header class="card-header">
+        <div class="location-badge">
+          <svg class="icon-geo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <h2 id="city">Locating...</h2>
+        </div>
+        <p id="date" class="timestamp">--:-- --</p>
+      </header>
 
-        <h2 id="city">Loading...</h2>
-        <p id="date"></p>
+      <!-- Main Visual Section -->
+      <section class="weather-hero">
+        <div class="icon-wrapper">
+          <img id="weatherImg" src="" alt="Weather condition" />
+        </div>
+        <div class="temp-wrapper">
+          <span id="temp">--</span><span class="temp-unit">°C</span>
+        </div>
+        <p id="desc" class="condition-label">Fetching forecast...</p>
+      </section>
 
-        <div class="weather-box">
-            <img id="weatherImg" src="" alt="">
-            <h1 id="temp">--°C</h1>
-            <p id="desc">--</p>
+      <!-- Metrics Grid -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-icon">💨</span>
+          <div class="metric-details">
+            <span class="metric-label">Wind Speed</span>
+            <span id="wind" class="metric-val">--</span>
+          </div>
         </div>
 
-        <div class="info">
-            🌬 Wind: <span id="wind">--</span><br>
-            💧 Humidity: <span id="humidity">--</span><br>
-            ☔ Rain: <span id="rain">--</span>
+        <div class="metric-card">
+          <span class="metric-icon">💧</span>
+          <div class="metric-details">
+            <span class="metric-label">Humidity</span>
+            <span id="humidity" class="metric-val">--</span>
+          </div>
         </div>
 
-        <button id="refresh">📍 Refresh Location</button>
+        <div class="metric-card">
+          <span class="metric-icon">🌧️</span>
+          <div class="metric-details">
+            <span class="metric-label">Precipitation</span>
+            <span id="rain" class="metric-val">--</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-icon">🌡️</span>
+          <div class="metric-details">
+            <span class="metric-label">Feels Like</span>
+            <span id="feels-like" class="metric-val">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Footer -->
+      <footer class="card-footer">
+        <button id="refresh" class="action-btn">
+          <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          <span>Refresh Location</span>
+        </button>
+      </footer>
 
     </div>
-</div>
+  </main>
 
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
