@@ -1,113 +1,230 @@
-
 const apiKey = "577457b685ad2bf6bc5af4cf5ebbfb4f";
 
-// DOM
-const city = document.getElementById("city");
-const temp = document.getElementById("temp");
-const desc = document.getElementById("desc");
-const wind = document.getElementById("wind");
-const humidity = document.getElementById("humidity");
-const rain = document.getElementById("rain");
+// DOM Elements
+const cityElem = document.getElementById("city");
+const tempElem = document.getElementById("temp");
+const descElem = document.getElementById("desc");
+const windElem = document.getElementById("wind");
+const humidityElem = document.getElementById("humidity");
+const rainElem = document.getElementById("rain");
+const feelsLikeElem = document.getElementById("feels-like");
 const weatherImg = document.getElementById("weatherImg");
-const date = document.getElementById("date");
+const dateElem = document.getElementById("date");
 const refreshBtn = document.getElementById("refresh");
+const canvas = document.getElementById("weather-canvas");
+const ctx = canvas.getContext("2d");
 
-// Live Date & Time
-function updateTime() {
-    const now = new Date();
-    date.innerText = now.toLocaleString();
+// Particle engine state
+let particles = [];
+let currentEffect = null;
+let animationFrameId = null;
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  const options = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  dateElem.innerText = now.toLocaleDateString(undefined, options);
 }
-setInterval(updateTime, 1000);
-updateTime();
+setInterval(updateClock, 1000);
+updateClock();
 
-// Weather Image Logic
-function setWeatherImage(condition, icon) {
-    const isNight = icon.includes("n");
+// Resize particle canvas
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-    if (condition.includes("rain")) {
-        weatherImg.src = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
-    } 
-    else if (condition.includes("cloud")) {
-        weatherImg.src = "https://cdn-icons-png.flaticon.com/512/414/414825.png";
-    } 
-    else if (condition.includes("clear")) {
-        weatherImg.src = isNight
-            ? "https://cdn-icons-png.flaticon.com/512/869/869869.png"   // moon
-            : "https://cdn-icons-png.flaticon.com/512/869/869869.png"; // sun
-    } 
-    else {
-        weatherImg.src = "https://cdn-icons-png.flaticon.com/512/1779/1779940.png";
+// Ambient Particle Simulation
+class Particle {
+  constructor(type) {
+    this.type = type;
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height;
+    if (this.type === "rain") {
+      this.speedY = 12 + Math.random() * 8;
+      this.length = 15 + Math.random() * 15;
+      this.speedX = -1.5;
+    } else if (this.type === "snow") {
+      this.speedY = 1.2 + Math.random() * 2;
+      this.speedX = Math.sin(Math.random() * Math.PI) * 1.5;
+      this.radius = 2 + Math.random() * 3;
     }
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    if (this.y > canvas.height) {
+      this.reset();
+      this.y = 0;
+    }
+  }
+
+  draw() {
+    if (this.type === "rain") {
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x + this.speedX * 2, this.y + this.length);
+      ctx.stroke();
+    } else if (this.type === "snow") {
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 }
 
-// Weather API
-function getWeather(lat, lon) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+function startParticles(type, count = 100) {
+  if (currentEffect === type) return;
+  currentEffect = type;
+  particles = [];
 
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
+  if (type === "none") {
+    cancelAnimationFrame(animationFrameId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
 
-            temp.innerText = Math.round(data.main.temp) + "°C";
-            desc.innerText = data.weather[0].description;
-            wind.innerText = data.wind.speed + " m/s";
-            humidity.innerText = data.main.humidity + "%";
+  for (let i = 0; i < count; i++) {
+    const p = new Particle(type);
+    p.y = Math.random() * canvas.height; // initial scatter
+    particles.push(p);
+  }
 
-            // Rain detection
-            rain.innerText = data.rain ? "Yes" : "No";
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let p of particles) {
+      p.update();
+      p.draw();
+    }
+    animationFrameId = requestAnimationFrame(loop);
+  }
 
-            const condition = data.weather[0].main.toLowerCase();
-            const icon = data.weather[0].icon;
-
-            setWeatherImage(condition, icon);
-        })
-        .catch(() => {
-            city.innerText = "Weather data error";
-        });
+  cancelAnimationFrame(animationFrameId);
+  loop();
 }
 
-// Address (Street + City)
-function getAddress(lat, lon) {
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
-        .then(res => res.json())
-        .then(data => {
-            const a = data.address;
-            const road = a.road || "";
-            const place = a.city || a.town || a.village || "";
+// Visual Theme Engine
+function applyTheme(condition, isNight) {
+  document.body.className = "";
 
-            city.innerText = `${road}, ${place}`;
-        })
-        .catch(() => {
-            city.innerText = "Location not found";
-        });
+  if (condition.includes("rain") || condition.includes("drizzle")) {
+    document.body.classList.add("weather-rain");
+    weatherImg.src = "https://cdn-icons-png.flaticon.com/512/3351/3351979.png";
+    startParticles("rain", 120);
+  } else if (condition.includes("thunderstorm")) {
+    document.body.classList.add("weather-thunderstorm");
+    weatherImg.src = "https://cdn-icons-png.flaticon.com/512/3104/3104612.png";
+    startParticles("rain", 160);
+  } else if (condition.includes("snow")) {
+    document.body.classList.add("weather-snow");
+    weatherImg.src = "https://cdn-icons-png.flaticon.com/512/2315/2315309.png";
+    startParticles("snow", 75);
+  } else if (condition.includes("cloud")) {
+    document.body.classList.add("weather-clouds");
+    weatherImg.src = isNight
+      ? "https://cdn-icons-png.flaticon.com/512/5903/5903939.png"
+      : "https://cdn-icons-png.flaticon.com/512/414/414825.png";
+    startParticles("none");
+  } else if (condition.includes("clear")) {
+    document.body.classList.add(isNight ? "weather-clear-night" : "weather-clear-day");
+    weatherImg.src = isNight
+      ? "https://cdn-icons-png.flaticon.com/512/581/581601.png"
+      : "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+    startParticles("none");
+  } else {
+    // Mist, Haze, Smoke, Fog
+    document.body.classList.add("weather-clouds");
+    weatherImg.src = "https://cdn-icons-png.flaticon.com/512/4005/4005901.png";
+    startParticles("none");
+  }
 }
 
-// Get Location
+// Fetch Weather
+async function getWeather(lat, lon) {
+  try {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
+    );
+    const data = await res.json();
+
+    if (data.cod && data.cod !== 200) {
+      cityElem.innerText = "Location Error";
+      return;
+    }
+
+    tempElem.innerText = Math.round(data.main.temp);
+    descElem.innerText = data.weather[0].description;
+    windElem.innerText = `${data.wind.speed} m/s`;
+    humidityElem.innerText = `${data.main.humidity}%`;
+    feelsLikeElem.innerText = `${Math.round(data.main.feels_like)}°C`;
+
+    // Precipitation check
+    const rainVol = data.rain ? (data.rain["1h"] || data.rain["3h"] || "Yes") : "0 mm";
+    rainElem.innerText = rainVol === "0 mm" ? "None" : `${rainVol} mm`;
+
+    const condition = data.weather[0].main.toLowerCase();
+    const isNight = data.weather[0].icon.includes("n");
+
+    applyTheme(condition, isNight);
+  } catch (err) {
+    cityElem.innerText = "Service Unavailable";
+  }
+}
+
+// Fetch Reverse Geolocation
+async function getAddress(lat, lon) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+    );
+    const data = await res.json();
+    const a = data.address || {};
+    const primary = a.suburb || a.neighbourhood || a.road || "";
+    const secondary = a.city || a.town || a.village || a.state || "";
+
+    cityElem.innerText = primary && secondary ? `${primary}, ${secondary}` : primary || secondary || "Local Area";
+  } catch {
+    cityElem.innerText = "My Location";
+  }
+}
+
+// Acquire Coordinates
 function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-
-                getWeather(lat, lon);
-                getAddress(lat, lon);
-            },
-            () => {
-                city.innerText = "Permission denied";
-            }
-        );
-    } else {
-        city.innerText = "Geolocation not supported";
-    }
+  cityElem.innerText = "Locating...";
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        getWeather(lat, lon);
+        getAddress(lat, lon);
+      },
+      () => {
+        cityElem.innerText = "Permission Denied";
+      },
+      { timeout: 10000 }
+    );
+  } else {
+    cityElem.innerText = "Geolocation Unsupported";
+  }
 }
 
-// Button click
 refreshBtn.addEventListener("click", getLocation);
 
-// Auto load
+// Initialize on page load
 getLocation();
-
-
-
-
